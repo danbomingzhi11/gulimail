@@ -11,9 +11,10 @@ package com.wyf.gulimall.utils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wyf.gulimall.xss.SQLFilter;
-import org.apache.commons.lang.StringUtils;
+
 
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class Query<T> {
         }
 
         //没有排序字段，则不排序
-        if(StringUtils.isBlank(defaultOrderField)){
+        if(StringUtils.isEmpty(defaultOrderField)){
             return page;
         }
 
