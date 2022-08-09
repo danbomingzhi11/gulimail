@@ -17,6 +17,12 @@
 		<java.version>1.8</java.version>
 	</properties>
 	<dependencies>
+		<!--导入common组件-->
+		<dependency>
+			<groupId>com.wyf.gulimall</groupId>
+			<artifactId>gulimall-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
