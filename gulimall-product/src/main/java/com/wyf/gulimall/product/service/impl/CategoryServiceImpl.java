@@ -1,6 +1,7 @@
 package com.wyf.gulimall.product.service.impl;
 
 import com.wyf.gulimall.product.entity.bo.CategoryBo;
+import com.wyf.gulimall.product.entity.vo.Catalog2Vo;
 import com.wyf.gulimall.utils.PageUtils;
 import com.wyf.gulimall.utils.Query;
 import org.springframework.beans.BeanUtils;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -27,6 +29,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryDao categoryDao;
+
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -73,6 +76,74 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     @Override
     public void updateCategoryByBody(CategoryEntity categoryEntity) {
         categoryDao.updateById(categoryEntity);
+    }
+
+    // 返回分类父子级树级关系
+    @Override
+    public List<Long> findCategoryList(Long cateId) {
+        List<Long> list = new ArrayList<>();
+        List<Long> result = findAll(cateId, list);
+        return result;
+    }
+
+    // 递归查找父子级
+    private List<Long> findAll(Long cateId, List<Long> list) {
+        CategoryEntity categoryEntity = categoryDao.selectById(cateId);
+        if (categoryEntity.getParentCid() != 0) {
+            this.findAll(categoryEntity.getParentCid(), list);
+        }
+        list.add(categoryEntity.getCatId());
+        return list;
+    }
+
+    // 根据一级分类 查询二级三级分类并且返回
+
+
+    @Override
+    public Map<String, List<Catalog2Vo>> getCatelogJson() {
+        // 获取一级分类
+        List<CategoryEntity> parent_cid = this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+        Map<String, List<Catalog2Vo>> listMap = parent_cid.stream()
+                .collect(Collectors.toMap(k -> {
+                    // 将一级分类的id 作为 K 键
+                    return k.getCatId().toString();
+                }, V -> {
+                    // 创建接受二级级分类的 类
+                    List<Catalog2Vo> catalog2Vos = null;
+                    // 获取所有二级分类
+                    List<CategoryEntity> level2 = this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", V.getCatId()));
+                    if (level2 != null) {
+                        catalog2Vos = level2.stream()
+                                .map(leve2 -> {
+                                    // 查出三级分类
+                                    List<CategoryEntity> level3 = this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", leve2.getCatId()));
+                                    // 创建接受三级分类的 类
+                                    List<Catalog2Vo.Catalog3Vo> catalog3Vos = null;
+                                    if (level3 != null) {
+                                        catalog3Vos = level3.stream()
+                                                .map(leve3 -> {
+                                                    // 给三级分类的对应Entity赋值
+                                                    Catalog2Vo.Catalog3Vo catalog3Vo = new Catalog2Vo.Catalog3Vo(leve2.getCatId().toString(), leve3.getCatId().toString(), leve3.getName());
+                                                    return catalog3Vo;
+                                                }).collect(Collectors.toList());
+                                    }
+                                    // 将三级分类赋值到对应的 entity的类 加入到二级分类
+                                    Catalog2Vo catalog2Vo = new Catalog2Vo(V.getParentCid().toString(), leve2.getCatId().toString(), leve2.getName(), catalog3Vos);
+                                    return catalog2Vo;
+                                }).collect(Collectors.toList());
+                    }
+                    return catalog2Vos;
+                }));
+
+        return listMap;
+    }
+
+    // 查找所有一级分类
+    @Override
+    public List<CategoryEntity> getLevel1Catagories() {
+        List<CategoryEntity> parent_cid = this.list(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
+
+        return parent_cid;
     }
 
     public List<CategoryBo> createTreeCategory(List<CategoryBo> categoryBoList) {

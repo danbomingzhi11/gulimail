@@ -67,6 +67,10 @@ public class PageUtils implements Serializable {
 		this.totalPage = (int)page.getPages();
 	}
 
+    public PageUtils() {
+
+    }
+
 	public int getTotalCount() {
 		return totalCount;
 	}

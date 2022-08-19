@@ -3,6 +3,10 @@ package com.wyf.gulimall.product.dao;
 import com.wyf.gulimall.product.entity.AttrEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -13,5 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AttrDao extends BaseMapper<AttrEntity> {
-	
+	List<AttrEntity> selectAllAttrByCatelogId(Long catelogId, @Param("params") Map<String, Object> params);
 }

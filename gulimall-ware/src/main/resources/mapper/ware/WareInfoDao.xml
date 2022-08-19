@@ -3,13 +3,20 @@
 
 <mapper namespace="com.wyf.gulimall.ware.dao.WareInfoDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.wyf.gulimall.ware.entity.WareInfoEntity" id="wareInfoMap">
-        <result property="id" column="id"/>
-        <result property="name" column="name"/>
-        <result property="address" column="address"/>
-        <result property="areacode" column="areacode"/>
-    </resultMap>
+    <select id="selectWareByMessage" resultType="com.wyf.gulimall.ware.entity.WareInfoEntity" parameterType="Map">
+        SELECT
+        *
+        FROM
+        `wms_ware_info` p
+        WHERE
+        1
+        <if test="params.key != null and params.key != '' ">
+            AND p.name LIKE '%${params.key}%'
+        </if>
+        <if test="params.order != null and params.order != ''">
+            order by #{params.sidx} #{params.order}
+        </if>
 
+    </select>
 
 </mapper>

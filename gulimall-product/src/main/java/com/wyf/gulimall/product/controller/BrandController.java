@@ -5,7 +5,13 @@ import java.util.Map;
 
 import com.wyf.gulimall.utils.PageUtils;
 import com.wyf.gulimall.utils.R;
+import com.wyf.gulimall.valid.AddGroup;
+import com.wyf.gulimall.valid.UpdateGroup;
+import com.wyf.gulimall.valid.UpdateStatusGroup;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +31,7 @@ import com.wyf.gulimall.product.service.BrandService;
  * @email 
  * @date 2022-08-02 21:12:22
  */
+@Api(value = "品牌API", tags = {"品牌API"})
 @RestController
 @RequestMapping("product/brand")
 public class BrandController {
@@ -55,23 +62,36 @@ public class BrandController {
     }
 
     /**
-     * 保存
+     * 新增品牌
      */
+    @ApiOperation(value = "新增品牌", notes = "新增品牌", httpMethod = "POST")
     @RequestMapping("/save")
-    //@RequiresPermissions("product:brand:save")
-    public R save(@RequestBody BrandEntity brand){
+    public R save(@Validated({AddGroup.class}) @RequestBody BrandEntity brand){
 		brandService.save(brand);
 
         return R.ok();
     }
 
     /**
-     * 修改
+     * 修改品牌
      */
+    @ApiOperation(value = "修改品牌", notes = "修改品牌", httpMethod = "POST")
     @RequestMapping("/update")
     //@RequiresPermissions("product:brand:update")
-    public R update(@RequestBody BrandEntity brand){
+    public R update(@Validated({UpdateGroup.class}) @RequestBody BrandEntity brand){
 		brandService.updateById(brand);
+
+        return R.ok();
+    }
+
+    /**
+     * 修改状态
+     */
+    @ApiOperation(value = "修改状态", notes = "修改状态", httpMethod = "POST")
+    @RequestMapping("/update/status")
+    //@RequiresPermissions("product:brand:update")
+    public R updateStatus(@Validated(UpdateStatusGroup.class) @RequestBody BrandEntity brand){
+        brandService.updateById(brand);
 
         return R.ok();
     }

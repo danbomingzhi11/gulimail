@@ -3,14 +3,22 @@
 
 <mapper namespace="com.wyf.gulimall.product.dao.CategoryBrandRelationDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.wyf.gulimall.product.entity.CategoryBrandRelationEntity" id="categoryBrandRelationMap">
-        <result property="id" column="id"/>
-        <result property="brandId" column="brand_id"/>
-        <result property="catelogId" column="catelog_id"/>
-        <result property="brandName" column="brand_name"/>
-        <result property="catelogName" column="catelog_name"/>
-    </resultMap>
+    <!--根据品牌ID 找到所有的 对应商品关系-->
+    <select id="selectCategoryByBrandId" resultType="com.wyf.gulimall.product.entity.vo.CategoryBrandVo"
+            parameterType="String">
+        SELECT p.catelog_id as catelogId,
+               p.brand_name as catelogName
+        FROM `pms_category_brand_relation` p
+        WHERE p.brand_id = #{brandId}
+    </select>
 
 
+    <!--根据分类id查询 对应的品牌信息-->
+    <select id="selectBrandyByCateId" resultType="com.wyf.gulimall.product.entity.vo.BrandVo"
+            parameterType="String">
+        SELECT p.brand_id as brandId,
+               p.brand_name as brandName
+        FROM `pms_category_brand_relation` p
+        WHERE p.catelog_id = #{cateId}
+    </select>
 </mapper>

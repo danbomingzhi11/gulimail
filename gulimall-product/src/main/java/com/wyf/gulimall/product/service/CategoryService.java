@@ -3,6 +3,7 @@ package com.wyf.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wyf.gulimall.product.entity.CategoryEntity;
 import com.wyf.gulimall.product.entity.bo.CategoryBo;
+import com.wyf.gulimall.product.entity.vo.Catalog2Vo;
 import com.wyf.gulimall.utils.PageUtils;
 
 import java.util.List;
@@ -42,5 +43,24 @@ public interface CategoryService extends IService<CategoryEntity> {
      * @param categoryEntity
      */
     void updateCategoryByBody(CategoryEntity categoryEntity);
- }
+
+    /**
+     * 返回分类父子级树级关系
+     * @param cateId
+     * @return
+     */
+    List<Long> findCategoryList(Long cateId);
+
+    /**
+     * 查找所有一级分类
+     * @return
+     */
+    List<CategoryEntity> getLevel1Catagories();
+
+    /**
+     * 根据一级分类 查询二级三级分类并且返回
+     * @return
+     */
+    Map<String, List<Catalog2Vo>> getCatelogJson();
+}
 

@@ -3,12 +3,11 @@ package com.wyf.gulimall.coupon.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.wyf.gulimall.to.SkuReductionTo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.wyf.gulimall.coupon.entity.SkuFullReductionEntity;
 import com.wyf.gulimall.coupon.service.SkuFullReductionService;
@@ -24,11 +23,19 @@ import com.wyf.gulimall.utils.R;
  * @email 
  * @date 2022-08-02 23:28:13
  */
+@Api(value = "优惠满减服务API", tags = {"优惠满减服务API"})
 @RestController
 @RequestMapping("coupon/skufullreduction")
 public class SkuFullReductionController {
     @Autowired
     private SkuFullReductionService skuFullReductionService;
+
+    @ApiOperation(value = "远程调用API 保存满减数据", notes = "远程调用API 保存满减数据", httpMethod = "POST")
+    @PostMapping("/saveInfo")
+    public R saveSkuReductionTo(@RequestBody SkuReductionTo skuReductionTo) {
+        skuFullReductionService.saveSkuReductionTo(skuReductionTo);
+        return R.ok();
+    }
 
     /**
      * 列表

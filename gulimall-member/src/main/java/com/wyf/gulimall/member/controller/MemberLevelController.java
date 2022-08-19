@@ -3,6 +3,8 @@ package com.wyf.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,7 @@ import com.wyf.gulimall.utils.R;
  * @email 
  * @date 2022-08-03 09:09:47
  */
+@Api(value = "会员等级接口", tags = {"会员等级接口"})
 @RestController
 @RequestMapping("member/memberlevel")
 public class MemberLevelController {
@@ -31,10 +34,10 @@ public class MemberLevelController {
     private MemberLevelService memberLevelService;
 
     /**
-     * 列表
+     * 查询所有会员等级列表
      */
+    @ApiOperation(value = "查询所有会员等级列表", notes = "查询所有会员等级列表", httpMethod = "GET")
     @RequestMapping("/list")
-    //@RequiresPermissions("member:memberlevel:list")
     public R list(@RequestParam Map<String, Object> params){
         PageUtils page = memberLevelService.queryPage(params);
 

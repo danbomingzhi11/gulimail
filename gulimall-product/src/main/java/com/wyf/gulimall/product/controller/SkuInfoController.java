@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.wyf.gulimall.utils.PageUtils;
 import com.wyf.gulimall.utils.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,7 @@ import com.wyf.gulimall.product.service.SkuInfoService;
  * @email 
  * @date 2022-08-02 21:12:22
  */
+@Api(value = "商品sku规格API", tags = {"商品sku规格API"})
 @RestController
 @RequestMapping("product/skuinfo")
 public class SkuInfoController {
@@ -30,12 +33,13 @@ public class SkuInfoController {
     private SkuInfoService skuInfoService;
 
     /**
-     * 列表
+     * 根据条件查询对应的sku信息
      */
+    @ApiOperation(value = "根据条件查询对应的sku信息", notes = "根据条件查询对应的sku信息", httpMethod = "GET")
     @RequestMapping("/list")
     //@RequiresPermissions("product:skuinfo:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = skuInfoService.queryPage(params);
+        PageUtils page = skuInfoService.selectAllSkuByMessage(params);
 
         return R.ok().put("page", page);
     }
@@ -55,7 +59,7 @@ public class SkuInfoController {
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @RequestMapping("/spuinfo/save")
     //@RequiresPermissions("product:skuinfo:save")
     public R save(@RequestBody SkuInfoEntity skuInfo){
 		skuInfoService.save(skuInfo);

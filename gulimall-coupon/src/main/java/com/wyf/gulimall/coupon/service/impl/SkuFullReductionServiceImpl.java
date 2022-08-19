@@ -1,5 +1,10 @@
 package com.wyf.gulimall.coupon.service.impl;
 
+import com.wyf.gulimall.coupon.entity.SkuLadderEntity;
+import com.wyf.gulimall.coupon.service.SkuLadderService;
+import com.wyf.gulimall.to.SkuReductionTo;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -16,6 +21,9 @@ import com.wyf.gulimall.coupon.service.SkuFullReductionService;
 @Service("skuFullReductionService")
 public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao, SkuFullReductionEntity> implements SkuFullReductionService {
 
+    @Autowired
+    private SkuLadderService skuLadderService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SkuFullReductionEntity> page = this.page(
@@ -26,4 +34,14 @@ public class SkuFullReductionServiceImpl extends ServiceImpl<SkuFullReductionDao
         return new PageUtils(page);
     }
 
+    // 保存满减数据
+    @Override
+    public void saveSkuReductionTo(SkuReductionTo skuReductionTo) {
+        SkuFullReductionEntity skuFullReductionEntity = new SkuFullReductionEntity();
+        BeanUtils.copyProperties(skuReductionTo,skuFullReductionEntity);
+        this.baseMapper.insert(skuFullReductionEntity);
+        SkuLadderEntity skuLadderEntity = new SkuLadderEntity();
+        BeanUtils.copyProperties(skuReductionTo,skuLadderEntity);
+        skuLadderService.save(skuLadderEntity);
+    }
 }

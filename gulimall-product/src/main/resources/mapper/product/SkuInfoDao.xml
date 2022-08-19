@@ -3,20 +3,27 @@
 
 <mapper namespace="com.wyf.gulimall.product.dao.SkuInfoDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="com.wyf.gulimall.product.entity.SkuInfoEntity" id="skuInfoMap">
-        <result property="skuId" column="sku_id"/>
-        <result property="spuId" column="spu_id"/>
-        <result property="skuName" column="sku_name"/>
-        <result property="skuDesc" column="sku_desc"/>
-        <result property="catalogId" column="catalog_id"/>
-        <result property="brandId" column="brand_id"/>
-        <result property="skuDefaultImg" column="sku_default_img"/>
-        <result property="skuTitle" column="sku_title"/>
-        <result property="skuSubtitle" column="sku_subtitle"/>
-        <result property="price" column="price"/>
-        <result property="saleCount" column="sale_count"/>
-    </resultMap>
+    <select id="selectAllSkuByMessage" resultType="com.wyf.gulimall.product.entity.SkuInfoEntity" parameterType="Map">
+        SELECT
+        *
+        FROM
+        `pms_sku_info` p
+        WHERE
+        1
+        <if test="params.brandId != null and params.brandId != 0 ">
+            AND p.brand_id = #{params.brandId}
+        </if>
+        <if test="params.catelogId != null and params.catelogId != 0 ">
+            AND p.catalog_id = #{params.catelogId}
+        </if>
+        <if test="params.key != null and params.key != '' ">
+            AND p.sku_name LIKE '%${params.key}%'
+        </if>
+        <if test=" params.min != null and params.min != '' and params.max != null and params.max != 0 " >
+            AND p.price between #{params.min} and #{params.max}
+        </if>
+
+    </select>
 
 
 </mapper>

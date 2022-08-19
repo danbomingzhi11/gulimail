@@ -1,6 +1,7 @@
 package com.wyf.gulimall.product.entity.bo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wyf.gulimall.product.entity.CategoryEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -58,6 +59,7 @@ public class CategoryBo {
     /**
      *
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @ApiModelProperty(value = "子类数组 树形结构")
     private List<CategoryBo> children = new ArrayList<>();
 }

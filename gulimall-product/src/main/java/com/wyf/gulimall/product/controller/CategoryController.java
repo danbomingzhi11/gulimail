@@ -55,6 +55,7 @@ public class CategoryController {
     /**
      * 根据id查询对应的category数据
      */
+    @ApiOperation(value = "根据id查询对应的category数据", notes = "根据id查询对应的category数据", httpMethod = "GET")
     @RequestMapping("/info/{catId}")
     public R info(@PathVariable("catId") Long catId) {
         CategoryEntity category = categoryService.getById(catId);
@@ -65,8 +66,8 @@ public class CategoryController {
     /**
      * 新增子类
      */
-    @RequestMapping("/save")
     @ApiOperation(value = "新增子类", notes = "新增子类", httpMethod = "POST")
+    @RequestMapping("/save")
     public R save(@RequestBody CategoryEntity category) {
         categoryService.saveCategoryByBody(category);
 

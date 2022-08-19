@@ -3,6 +3,8 @@ package com.wyf.gulimall.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +25,8 @@ import com.wyf.gulimall.utils.R;
  * @email 
  * @date 2022-08-02 21:12:22
  */
+
+@Api(value = "商品属性", tags = {"商品属性"})
 @RestController
 @RequestMapping("product/attr")
 public class AttrController {
@@ -30,12 +34,13 @@ public class AttrController {
     private AttrService attrService;
 
     /**
-     * 列表
+     * 获取分类销售属性
      */
-    @RequestMapping("/list")
-    //@RequiresPermissions("product:attr:list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = attrService.queryPage(params);
+    @ApiOperation(value = "获取分类销售属性", notes = "获取分类销售属性", httpMethod = "GET")
+    @RequestMapping("/sale/list/{catelogId}")
+    public R list(@RequestParam Map<String, Object> params,
+                  @PathVariable Long catelogId){
+        PageUtils page = attrService.selectAllAttrByCatelogId(catelogId, params);
 
         return R.ok().put("page", page);
     }
@@ -53,12 +58,13 @@ public class AttrController {
     }
 
     /**
-     * 保存
+     * 新增属性，并且新增属性与属性组关联
      */
+    @ApiOperation(value = "新增属性，并且新增属性与属性组关联", notes = "新增属性，并且新增属性与属性组关联", httpMethod = "POST")
     @RequestMapping("/save")
     //@RequiresPermissions("product:attr:save")
     public R save(@RequestBody AttrEntity attr){
-		attrService.save(attr);
+		attrService.saveAttrAndGroup(attr);
 
         return R.ok();
     }

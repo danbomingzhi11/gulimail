@@ -3,6 +3,8 @@ package com.wyf.gulimall.ware.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,7 @@ import com.wyf.gulimall.utils.R;
  * @email 
  * @date 2022-08-03 09:27:19
  */
+@Api(value = "仓库信息Api", tags = {"仓库信息API"})
 @RestController
 @RequestMapping("ware/wareinfo")
 public class WareInfoController {
@@ -31,12 +34,12 @@ public class WareInfoController {
     private WareInfoService wareInfoService;
 
     /**
-     * 列表
+     * 获取所有的仓库列表数据
      */
+    @ApiOperation(value = "获取所有的仓库列表数据", notes = "获取所有的仓库列表数据", httpMethod = "GET")
     @RequestMapping("/list")
-    //@RequiresPermissions("ware:wareinfo:list")
     public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = wareInfoService.queryPage(params);
+        PageUtils page = wareInfoService.selectWareByMessage(params);
 
         return R.ok().put("page", page);
     }

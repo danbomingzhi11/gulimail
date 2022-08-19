@@ -17,5 +17,12 @@ import java.util.Map;
 public interface WareInfoService extends IService<WareInfoEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 获取所有的仓库列表数据
+     * @param params
+     * @return
+     */
+    PageUtils selectWareByMessage(Map<String, Object> params);
 }
 

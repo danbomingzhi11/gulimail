@@ -3,6 +3,10 @@ package com.wyf.gulimall.product.dao;
 import com.wyf.gulimall.product.entity.SkuInfoEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * sku
@@ -13,5 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface SkuInfoDao extends BaseMapper<SkuInfoEntity> {
-	
+
+
+    List<SkuInfoEntity> selectAllSkuByMessage(@Param("params") Map<String, Object> params);
 }
