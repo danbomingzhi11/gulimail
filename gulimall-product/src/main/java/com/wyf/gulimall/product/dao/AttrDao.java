@@ -18,4 +18,6 @@ import java.util.Map;
 @Mapper
 public interface AttrDao extends BaseMapper<AttrEntity> {
 	List<AttrEntity> selectAllAttrByCatelogId(Long catelogId, @Param("params") Map<String, Object> params);
+
+    List<Long> selectSearchAttrIds(@Param("attrIds") List<Long> attrIds);
 }

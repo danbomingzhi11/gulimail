@@ -56,6 +56,8 @@ public class SkuInfoEntity implements Serializable {
 	/**
 	 * 
 	 */
+
+
 	private String skuSubtitle;
 	/**
 	 * 

@@ -67,7 +67,6 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     }
 
     // 获取分类销售属性
-
     @Override
     public PageUtils selectAllAttrByCatelogId(Long catelogId, Map<String, Object> params) {
         // 存入key的 int形式 为了方便通过 id 查找
@@ -129,5 +128,10 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             findAllFather(categoryEntity.getParentCid(), sb);
         }
         return sb.append(categoryEntity.getName()).append("/");
+    }
+
+    @Override
+    public List<Long> selectSearchAttrIds(List<Long> attrIds) {
+        return baseMapper.selectSearchAttrIds(attrIds);
     }
 }

@@ -3,11 +3,11 @@
 
 <mapper namespace="com.wyf.gulimall.product.dao.AttrDao">
 
-	<select id="selectAllAttrByCatelogId" resultType="com.wyf.gulimall.product.entity.AttrEntity" parameterType="Map">
+    <select id="selectAllAttrByCatelogId" resultType="com.wyf.gulimall.product.entity.AttrEntity" parameterType="Map">
         SELECT *
         FROM `pms_attr` p
         WHERE
-           catelog_id = #{catelogId}
+        catelog_id = #{catelogId}
         <if test="params.key != null and params.key != ''">
             AND (
             p.attr_id = #{params.keyInt} or
@@ -15,5 +15,11 @@
         </if>
     </select>
 
-
+    <select id="selectSearchAttrIds" resultType="java.lang.Long" parameterType="Long">
+        SELECT attr_id from pms_attr where attr_id in
+        <foreach collection="attrIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and search_type=1
+    </select>
 </mapper>

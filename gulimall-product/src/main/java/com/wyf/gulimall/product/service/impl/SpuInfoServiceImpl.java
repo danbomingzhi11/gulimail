@@ -1,21 +1,24 @@
 package com.wyf.gulimall.product.service.impl;
 
+import com.wyf.gulimall.constant.ProductConstant;
 import com.wyf.gulimall.product.dao.*;
 import com.wyf.gulimall.product.entity.*;
 import com.wyf.gulimall.product.entity.vo.*;
 import com.wyf.gulimall.product.feign.CouponFeignService;
-import com.wyf.gulimall.product.service.SkuSaleAttrValueService;
+import com.wyf.gulimall.product.feign.SearchFeignService;
+import com.wyf.gulimall.product.feign.WareFeignService;
+import com.wyf.gulimall.product.service.*;
+import com.wyf.gulimall.to.SkuHasStockVo;
 import com.wyf.gulimall.to.SkuReductionTo;
 import com.wyf.gulimall.to.SpuBoundTo;
+import com.wyf.gulimall.to.es.SkuEsModel;
 import com.wyf.gulimall.utils.R;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,7 +27,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wyf.gulimall.utils.PageUtils;
 import com.wyf.gulimall.utils.Query;
 
-import com.wyf.gulimall.product.service.SpuInfoService;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -34,26 +36,22 @@ import org.springframework.util.StringUtils;
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
 
     @Autowired
-    private SpuInfoDao spuInfoDao;
+    private SpuInfoDescService spuInfoDescService;
 
     @Autowired
-    private SpuImagesDao spuImagesDao;
+    private SpuImagesService spuImagesService;
 
     @Autowired
-    private SpuInfoDescDao spuInfoDescDao;
+    private AttrService attrService;
 
     @Autowired
-    private ProductAttrValueDao productAttrValueDao;
+    private ProductAttrValueService productAttrValueService;
 
     @Autowired
-    private AttrDao attrDao;
+    private SkuInfoService skuInfoService;
 
     @Autowired
-    private SkuInfoDao skuInfoDao;
-
-
-    @Autowired
-    private SkuImagesDao skuImagesDao;
+    private SkuImagesService skuImagesService;
 
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
@@ -61,6 +59,38 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     @Autowired
     private CouponFeignService couponFeignService;
 
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private SpuInfoDao  spuInfoDao;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private WareFeignService wareFeignService;
+
+    @Autowired
+    private SearchFeignService searchFeignService;
+
+    @Autowired
+    private SpuInfoDescDao spuInfoDescDao;
+
+    @Autowired
+    private SpuImagesDao spuImagesDao;
+
+    @Autowired
+    private AttrDao attrDao;
+
+    @Autowired
+    private SkuInfoDao skuInfoDao;
+
+    @Autowired
+    private ProductAttrValueDao productAttrValueDao;
+
+    @Autowired
+    private SkuImagesDao skuImagesDao;
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<SpuInfoEntity> page = this.page(
@@ -201,5 +231,75 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 }
             });
         }
+    }
+
+    @Override
+    public void upSpuForSearch(Long spuId) {
+        //1、查出当前spuId对应的所有sku信息,品牌的名字
+        List<SkuInfoEntity> skuInfoEntities=skuInfoService.getSkusBySpuId(spuId);
+        //TODO 4、查出当前sku的所有可以被用来检索的规格属性
+        List<ProductAttrValueEntity> productAttrValueEntities = productAttrValueService.list(new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+        List<Long> attrIds = productAttrValueEntities.stream().map(attr ->
+             attr.getAttrId()
+        ).collect(Collectors.toList());
+        List<Long> searchIds=attrService.selectSearchAttrIds(attrIds);
+        Set<Long> ids = new HashSet<>(searchIds);
+        List<SkuEsModel.Attr> searchAttrs = productAttrValueEntities.stream().filter(entity ->
+            ids.contains(entity.getAttrId())
+        ).map(entity -> {
+            SkuEsModel.Attr attr = new SkuEsModel.Attr();
+            BeanUtils.copyProperties(entity, attr);
+            return attr;
+        }).collect(Collectors.toList());
+
+
+        //TODO 1、发送远程调用，库存系统查询是否有库存
+        Map<Long, Boolean> stockMap = null;
+        try {
+            List<Long> longList = skuInfoEntities.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
+            List<SkuHasStockVo> skuHasStocks = wareFeignService.getSkuHasStocks(longList);
+            stockMap = skuHasStocks.stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, SkuHasStockVo::getHasStock));
+        }catch (Exception e){
+            log.error("远程调用库存服务失败,原因{}",e);
+        }
+
+        //2、封装每个sku的信息
+        Map<Long, Boolean> finalStockMap = stockMap;
+        List<SkuEsModel> skuEsModels = skuInfoEntities.stream().map(sku -> {
+            SkuEsModel skuEsModel = new SkuEsModel();
+            BeanUtils.copyProperties(sku, skuEsModel);
+            skuEsModel.setSkuPrice(sku.getPrice());
+            skuEsModel.setSkuImg(sku.getSkuDefaultImg());
+            //TODO 2、热度评分。0
+            skuEsModel.setHotScore(0L);
+            //TODO 3、查询品牌和分类的名字信息
+            BrandEntity brandEntity = brandService.getById(sku.getBrandId());
+            skuEsModel.setBrandName(brandEntity.getName());
+            skuEsModel.setBrandImg(brandEntity.getLogo());
+            CategoryEntity categoryEntity = categoryService.getById(sku.getCatalogId());
+            skuEsModel.setCatalogName(categoryEntity.getName());
+            //设置可搜索属性
+            skuEsModel.setAttrs(searchAttrs);
+            //设置是否有库存
+            skuEsModel.setHasStock(finalStockMap==null?false:finalStockMap.get(sku.getSkuId()));
+            return skuEsModel;
+        }).collect(Collectors.toList());
+
+        //TODO 5、将数据发给es进行保存：gulimall-search
+        R r = searchFeignService.saveProductAsIndices(skuEsModels);
+        if (r.getCode()==0){
+            this.baseMapper.upSpuStatus(spuId, ProductConstant.ProductStatusEnum.SPU_UP.getCode());
+        }else {
+            log.error("商品远程es保存失败");
+        }
+    }
+
+
+    public SpuInfoEntity getSpuBySkuId(Long skuId) {
+        SkuInfoEntity skuInfoEntity = skuInfoService.getById(skuId);
+        SpuInfoEntity spu = this.getById(skuInfoEntity.getSpuId());
+        BrandEntity brandEntity = brandService.getById(spu.getBrandId());
+        spu.setBrandName(brandEntity.getName());
+        return spu;
     }
 }

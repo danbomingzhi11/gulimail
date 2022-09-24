@@ -1,5 +1,6 @@
 package com.wyf.gulimall.product.web;
 
+import com.wyf.gulimall.product.entity.vo.SkuItemVo;
 import com.wyf.gulimall.product.service.SkuInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,8 +16,9 @@ public class ItemController {
 
     @GetMapping("/{skuId}.html")
     public String skuItem(@PathVariable("skuId") Long skuId, Model model) {
-//        SkuItemVo skuItemVo=skuInfoService.item(skuId);
-//        model.addAttribute("item", skuItemVo);
+        SkuItemVo skuItemVo=skuInfoService.item(skuId);
+        model.addAttribute("item", skuItemVo);
         return "item";
     }
+
 }

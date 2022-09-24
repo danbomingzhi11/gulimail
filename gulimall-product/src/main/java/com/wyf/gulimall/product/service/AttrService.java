@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.wyf.gulimall.product.entity.AttrEntity;
 import com.wyf.gulimall.utils.PageUtils;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,5 +31,7 @@ public interface AttrService extends IService<AttrEntity> {
      * @return
      */
     PageUtils selectAllAttrByCatelogId(Long catelogId, Map<String, Object> params);
+
+    List<Long> selectSearchAttrIds(List<Long> attrIds);
 }
 

@@ -19,4 +19,6 @@ import java.util.Map;
 @Mapper
 public interface SpuInfoDao extends BaseMapper<SpuInfoEntity> {
     List<SkuInfoEntity> selectAllSpuByMessage(@Param("params") Map<String, Object> params);
+
+    void upSpuStatus(@Param("spuId") Long spuId, @Param("code") int code);
 }

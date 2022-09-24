@@ -31,5 +31,7 @@ public interface SpuInfoService extends IService<SpuInfoEntity> {
      * @return
      */
     PageUtils selectAllSpuByMessage(Map<String, Object> params);
+
+    void upSpuForSearch(Long spuId);
 }
 

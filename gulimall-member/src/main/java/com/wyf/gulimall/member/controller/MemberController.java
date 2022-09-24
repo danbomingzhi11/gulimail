@@ -3,12 +3,14 @@ package com.wyf.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.wyf.gulimall.expection.BizCodeEnum;
+import com.wyf.gulimall.member.exception.PhoneException;
+import com.wyf.gulimall.member.exception.UsernameException;
+import com.wyf.gulimall.member.vo.MemberUserLoginVo;
+import com.wyf.gulimall.member.vo.MemberUserRegisterVo;
+import com.wyf.gulimall.member.vo.SocialUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.wyf.gulimall.member.entity.MemberEntity;
 import com.wyf.gulimall.member.service.MemberService;
@@ -29,6 +31,35 @@ import com.wyf.gulimall.utils.R;
 public class MemberController {
     @Autowired
     private MemberService memberService;
+
+
+
+    @PostMapping(value = "/register")
+    public R register(@RequestBody MemberUserRegisterVo vo) {
+
+        try {
+            memberService.register(vo);
+        } catch (PhoneException e) {
+            return R.error(BizCodeEnum.PHONE_EXIST_EXCEPTION.getCode(), BizCodeEnum.PHONE_EXIST_EXCEPTION.getMsg());
+        } catch (UsernameException e) {
+            return R.error(BizCodeEnum.USER_EXIST_EXCEPTION.getCode(), BizCodeEnum.USER_EXIST_EXCEPTION.getMsg());
+        }
+
+        return R.ok();
+    }
+
+
+    @PostMapping(value = "/login")
+    public R login(@RequestBody MemberUserLoginVo vo) {
+
+        MemberEntity memberEntity = memberService.login(vo);
+
+        if (memberEntity != null) {
+            return R.ok().setData(memberEntity);
+        } else {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getMsg());
+        }
+    }
 
     /**
      * 列表

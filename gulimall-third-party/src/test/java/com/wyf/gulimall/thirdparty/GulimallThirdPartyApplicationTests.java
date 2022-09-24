@@ -1,25 +1,35 @@
 package com.wyf.gulimall.thirdparty;
 
 import com.aliyun.oss.OSSClient;
+import com.wyf.gulimall.thirdparty.component.SmsComponent;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+@Slf4j
+@RunWith(SpringRunner.class)
 @SpringBootTest
-class GulimallThirdPartyApplicationTests {
-
-    @Test
-    void contextLoads() {
-
-
-    }
+public class GulimallThirdPartyApplicationTests {
 
     @Autowired
+    private SmsComponent smsComponent;
+
+    @Resource
     OSSClient ossClient;
+
+
+    @Test
+    public void sendSmsCode() {
+        smsComponent.sendSmsCode("19819069411", "6666");
+    }
 
     @Test
     public void testUpload() throws FileNotFoundException {
